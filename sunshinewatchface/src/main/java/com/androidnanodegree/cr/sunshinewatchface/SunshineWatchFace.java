@@ -46,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 public class SunshineWatchFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+    private static final Typeface BOLD_TYPEFACE =
+            Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
 
     /**
      * Update rate in milliseconds for interactive mode. We update once a second since seconds are
@@ -86,8 +88,15 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
+
         Paint mBackgroundPaint;
         Paint mTextPaint;
+        Paint mDatePaint;
+        Paint mHourPaint;
+        Paint mMinutePaint;
+        Paint mSecondPaint;
+        Paint mColonPaint;
+
         boolean mAmbient;
         Time mTime;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -127,6 +136,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mTextPaint = new Paint();
             mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
 
+            mHourPaint = createTextPaint(getColor(R.color.digital_text), BOLD_TYPEFACE);
+            mMinutePaint = createTextPaint(getColor(R.color.digital_text));
+            mSecondPaint = createTextPaint(getColor(R.color.digital_text));
+            mColonPaint  = createTextPaint(getColor(R.color.digital_text));
+
             mTime = new Time();
         }
 
@@ -136,10 +150,14 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             super.onDestroy();
         }
 
-        private Paint createTextPaint(int textColor) {
+        private Paint createTextPaint(int defaultInteractiveColor) {
+            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE);
+        }
+
+        private Paint createTextPaint(int textColor, Typeface typeface) {
             Paint paint = new Paint();
             paint.setColor(textColor);
-            paint.setTypeface(NORMAL_TYPEFACE);
+            paint.setTypeface(typeface);
             paint.setAntiAlias(true);
             return paint;
         }
@@ -193,6 +211,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
             mTextPaint.setTextSize(textSize);
+
+            mHourPaint.setTextSize(textSize);
+            mMinutePaint.setTextSize(textSize);
+            mSecondPaint.setTextSize(textSize);
+            mColonPaint.setTextSize(textSize);
         }
 
         @Override
@@ -239,29 +262,53 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     break;
                 case TAP_TYPE_TAP:
                     // The user has completed the tap gesture.
-                    mTapCount++;
-                    mBackgroundPaint.setColor(resources.getColor(mTapCount % 2 == 0 ?
-                            R.color.background : R.color.background2));
-                    break;
+                    // TODO Change background color on tap
+//                    mTapCount++;
+//                    mBackgroundPaint.setColor(resources.getColor(mTapCount % 2 == 0 ?
+//                            R.color.background : R.color.background2));
+//                    break;
             }
-            invalidate();
+//            invalidate();
         }
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             // Draw the background.
             if (isInAmbientMode()) {
-                canvas.drawColor(Color.BLACK);
+                canvas.drawColor(getColor(R.color.ambient_background));
             } else {
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
             }
 
-            // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
+            // Update the time
             mTime.setToNow();
-            String text = mAmbient
-                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
-            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
+
+            // Set the strings
+            String hourString = String.format("%02d:", mTime.hour);
+            String minuteString = String.format("%02d", mTime.minute);
+
+            // Calculate the offsets
+            float x = mXOffset;
+            float y = mYOffset;
+            float centerScreen = bounds.width() / 2;
+            float hourOffset = centerScreen - ( mHourPaint.measureText(hourString)
+                    - (mHourPaint.measureText(getString(R.string.time_separator))) / 2);
+            float minutesOffset = centerScreen +
+                    (mHourPaint.measureText(getString(R.string.time_separator)) / 2);
+
+            // Draw the hours
+            canvas.drawText(hourString, hourOffset, y, mHourPaint);
+            //x += mHourPaint.measureText(hourString);
+
+            // Draw the minutes
+            canvas.drawText(minuteString, minutesOffset, y, mMinutePaint);
+
+            // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
+//            mTime.setToNow();
+//            String text = mAmbient
+//                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
+//                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
+//            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
         }
 
         /**
