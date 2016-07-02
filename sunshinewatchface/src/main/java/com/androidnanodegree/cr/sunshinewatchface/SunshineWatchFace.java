@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SunshineWatchFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
-            Typeface.create("sans-serif-thin", Typeface.NORMAL);
+            Typeface.create("sans-serif-light", Typeface.NORMAL);
     private static final Typeface BOLD_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
