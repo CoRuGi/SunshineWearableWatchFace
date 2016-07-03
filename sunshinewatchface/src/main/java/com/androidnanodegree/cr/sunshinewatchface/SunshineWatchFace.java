@@ -32,10 +32,14 @@ import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +50,8 @@ import java.util.concurrent.TimeUnit;
 public class SunshineWatchFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create("sans-serif-light", Typeface.NORMAL);
+    private static final Typeface THIN_TYPEFACE =
+            Typeface.create("sans-serif-thin", Typeface.NORMAL);
     private static final Typeface BOLD_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
@@ -96,6 +102,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         Paint mMinutePaint;
         Paint mSecondPaint;
         Paint mColonPaint;
+        float mDateHeight = 15f;
 
         boolean mAmbient;
         Time mTime;
@@ -126,6 +133,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
                     .setAcceptsTapEvents(true)
+                    .setHotwordIndicatorGravity(Gravity.END|Gravity.TOP)
                     .build());
             Resources resources = SunshineWatchFace.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
@@ -140,6 +148,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mMinutePaint = createTextPaint(getColor(R.color.digital_text));
             mSecondPaint = createTextPaint(getColor(R.color.digital_text));
             mColonPaint  = createTextPaint(getColor(R.color.digital_text));
+            mDatePaint = createTextPaint(getColor(R.color.secondary_text));
 
             mTime = new Time();
         }
@@ -216,6 +225,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mMinutePaint.setTextSize(textSize);
             mSecondPaint.setTextSize(textSize);
             mColonPaint.setTextSize(textSize);
+
+            DisplayMetrics metrics = resources.getDisplayMetrics();
+            mDatePaint.setTextSize(mDateHeight * metrics.density);
+
         }
 
         @Override
@@ -286,6 +299,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             // Set the strings
             String hourString = String.format("%02d:", mTime.hour);
             String minuteString = String.format("%02d", mTime.minute);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd yyyy", Locale.US);
+            String dateString = dateFormat.format(System.currentTimeMillis());
 
             // Calculate the offsets
             float x = mXOffset;
@@ -295,12 +310,20 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     - (mHourPaint.measureText(getString(R.string.time_separator))) / 2);
             float minutesOffset = centerScreen +
                     (mHourPaint.measureText(getString(R.string.time_separator)) / 2);
+            float dateXOffset = centerScreen - (mDatePaint.measureText(dateString) / 2);
 
-            float timeYOffset = bounds.height() / 3;
+
+            float timeYOffset = (canvas.getHeight() / 5) * 2;
+
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            float dateYOffset = timeYOffset + (mDateHeight * metrics.density);
 
             // Draw the time
             canvas.drawText(hourString, hourOffset, timeYOffset, mHourPaint);
             canvas.drawText(minuteString, minutesOffset, timeYOffset, mMinutePaint);
+
+            // Draw the date
+            canvas.drawText(dateString, dateXOffset, dateYOffset, mDatePaint);
 
         }
 
