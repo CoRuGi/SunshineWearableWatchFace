@@ -296,12 +296,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             float minutesOffset = centerScreen +
                     (mHourPaint.measureText(getString(R.string.time_separator)) / 2);
 
-            // Draw the hours
-            canvas.drawText(hourString, hourOffset, y, mHourPaint);
-            //x += mHourPaint.measureText(hourString);
+            float timeYOffset = bounds.height() / 3;
 
-            // Draw the minutes
-            canvas.drawText(minuteString, minutesOffset, y, mMinutePaint);
+            // Draw the time
+            canvas.drawText(hourString, hourOffset, timeYOffset, mHourPaint);
+            canvas.drawText(minuteString, minutesOffset, timeYOffset, mMinutePaint);
 
         }
 
