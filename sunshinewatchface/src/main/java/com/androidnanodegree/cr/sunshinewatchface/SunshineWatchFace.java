@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -97,7 +96,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
         Paint mBackgroundPaint;
         Paint mTextPaint;
-        Paint mDatePaint;
+        Paint mSecondTextPaint;
         Paint mHourPaint;
         Paint mMinutePaint;
         Paint mSecondPaint;
@@ -148,7 +147,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mMinutePaint = createTextPaint(getColor(R.color.digital_text));
             mSecondPaint = createTextPaint(getColor(R.color.digital_text));
             mColonPaint  = createTextPaint(getColor(R.color.digital_text));
-            mDatePaint = createTextPaint(getColor(R.color.secondary_text));
+            mSecondTextPaint = createTextPaint(getColor(R.color.secondary_text));
 
             mTime = new Time();
         }
@@ -227,7 +226,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mColonPaint.setTextSize(textSize);
 
             DisplayMetrics metrics = resources.getDisplayMetrics();
-            mDatePaint.setTextSize(mDateHeight * metrics.density);
+            mSecondTextPaint.setTextSize(mDateHeight * metrics.density);
 
         }
 
@@ -296,11 +295,14 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             // Update the time
             mTime.setToNow();
 
+            mSecondTextPaint.setAlpha(100);
+
             // Set the strings
             String hourString = String.format("%02d:", mTime.hour);
             String minuteString = String.format("%02d", mTime.minute);
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd yyyy", Locale.US);
             String dateString = dateFormat.format(System.currentTimeMillis());
+            String separatorString = getString(R.string.watch_face_separator);
 
             // Calculate the offsets
             float x = mXOffset;
@@ -310,20 +312,24 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     - (mHourPaint.measureText(getString(R.string.time_separator))) / 2);
             float minutesOffset = centerScreen +
                     (mHourPaint.measureText(getString(R.string.time_separator)) / 2);
-            float dateXOffset = centerScreen - (mDatePaint.measureText(dateString) / 2);
-
+            float dateXOffset = centerScreen - (mSecondTextPaint.measureText(dateString) / 2);
+            float separatorXOffset = centerScreen - (mSecondTextPaint.measureText(separatorString) / 2);
 
             float timeYOffset = (canvas.getHeight() / 5) * 2;
 
             DisplayMetrics metrics = getResources().getDisplayMetrics();
             float dateYOffset = timeYOffset + (mDateHeight * metrics.density);
+            float separatorYOffset = dateYOffset + (20f * metrics.density);
 
             // Draw the time
             canvas.drawText(hourString, hourOffset, timeYOffset, mHourPaint);
             canvas.drawText(minuteString, minutesOffset, timeYOffset, mMinutePaint);
 
             // Draw the date
-            canvas.drawText(dateString, dateXOffset, dateYOffset, mDatePaint);
+            canvas.drawText(dateString, dateXOffset, dateYOffset, mSecondTextPaint);
+
+            //Draw the separator
+            canvas.drawText(separatorString, separatorXOffset, separatorYOffset, mSecondTextPaint);
 
         }
 

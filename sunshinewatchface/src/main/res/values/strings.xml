@@ -2,4 +2,5 @@
     <string name="app_name">Sunshine WatchFace</string>
     <string name="my_digital_name">Sunshine</string>
     <string name="time_separator">:</string>
+    <string name="watch_face_separator">_____</string>
 </resources>
