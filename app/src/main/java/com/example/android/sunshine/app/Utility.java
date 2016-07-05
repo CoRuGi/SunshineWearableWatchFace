@@ -603,4 +603,32 @@ public class Utility {
                 context.getString(R.string.pref_wearable_high_temp_status_key), -1
         );
     }
+
+    /**
+     * Set the wearable low temperature status so we can compare it later
+     *
+     * @param context Context used to get the SharedPreferences
+     * @param lowTemp Integer Today's low temperature
+     */
+    static public void setWearableLowTempStatus(Context context, Integer lowTemp) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(context.getString(R.string.pref_wearable_low_temp_status_key), lowTemp);
+        editor.apply();
+    }
+
+    /**
+     * Get the wearable low temperature status
+     *
+     * @param  context Context used to get the SharedPreferences
+     * @return Integer The saved today's low temperature
+     */
+    static public Integer getWearableLowTempStatus(Context context) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getInt(
+                context.getString(R.string.pref_wearable_low_temp_status_key), -1
+        );
+    }
 }

@@ -229,4 +229,5 @@
 
     <!-- For the Wearable WatchFace -->
     <string name="pref_wearable_high_temp_status_key">wearable_high_temp</string>
+    <string name="pref_wearable_low_temp_status_key">wearable_low_temp</string>
 </resources>
