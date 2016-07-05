@@ -575,4 +575,32 @@ public class Utility {
         spe.putInt(c.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
         spe.apply();
     }
+
+    /**
+     * Set the wearable high temperature status so we can compare it later
+     *
+     * @param context  Context used to get the SharedPreferences
+     * @param highTemp Integer Today's high temperature
+     */
+    static public void setWearableHighTempStatus(Context context, Integer highTemp) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(context.getString(R.string.pref_wearable_high_temp_status_key), highTemp);
+        editor.apply();
+    }
+
+    /**
+     * Get the wearable high temperature status
+     *
+     * @param  context Context used to get the SharedPreferences
+     * @return Integer The saved today's high temperature
+     */
+    static public Integer getWearableHighTempStatus(Context context) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getInt(
+                context.getString(R.string.pref_wearable_high_temp_status_key), -1
+        );
+    }
 }
