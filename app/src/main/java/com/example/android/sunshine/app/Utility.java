@@ -631,4 +631,34 @@ public class Utility {
                 context.getString(R.string.pref_wearable_low_temp_status_key), -1
         );
     }
+
+    /**
+     * Set the wearable weather condition status so we can compare it later
+     *
+     * @param context   Context used to get the SharedPreferences
+     * @param condition Integer Today's weather condition
+     */
+    static public void setWearableWeatherConditionStatus(Context context, Integer condition) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(context.getString(
+                R.string.pref_wearable_weather_condition_status_key), condition
+        );
+        editor.apply();
+    }
+
+    /**
+     * Get the wearable weather condition status
+     *
+     * @param  context Context used to get the SharedPreferences
+     * @return Integer The saved today's weather condition
+     */
+    static public Integer getWearableWeatherConditionStatus(Context context) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getInt(
+                context.getString(R.string.pref_wearable_weather_condition_status_key), -1
+        );
+    }
 }
