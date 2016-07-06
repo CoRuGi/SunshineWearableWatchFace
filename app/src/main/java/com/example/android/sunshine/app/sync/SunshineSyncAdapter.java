@@ -330,6 +330,19 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherId);
 
                 cVVector.add(weatherValues);
+
+                // Check the Wearable status and send an update if needed
+                Integer currentWearableHigh = Utility.getWearableHighTempStatus(getContext());
+                Integer currentWearableLow = Utility.getWearableLowTempStatus(getContext());
+                Integer currentWearableId = Utility.getWearableWeatherConditionStatus(getContext());
+
+                // Compare the values and if not equal then send an update
+                if (    currentWearableHigh != high ||
+                        currentWearableLow != low ||
+                        currentWearableId != weatherId ) {
+                    // TODO send update to wearable;
+                }
+
             }
 
             int inserted = 0;
