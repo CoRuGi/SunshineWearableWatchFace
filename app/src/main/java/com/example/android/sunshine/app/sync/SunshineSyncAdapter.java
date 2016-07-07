@@ -337,16 +337,19 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 Integer currentWearableLow = Utility.getWearableLowTempStatus(getContext());
                 Integer currentWearableId = Utility.getWearableWeatherConditionStatus(getContext());
 
-                // Compare the values and if not equal then send an update
-                if (    currentWearableHigh != high ||
-                        currentWearableLow != low ||
-                        currentWearableId != weatherId ) {
-                    Log.d(LOG_TAG, "Wearable will be updated");
-                    UpdateWearableForecast updateWearableForecast =
-                            new UpdateWearableForecast(getContext());
-                    updateWearableForecast.UpdateForecast(weatherId, high, low);
+                // For the values of Today
+                if (i == 0) {
+                    // Compare the values and if not equal then send an update
+                    if (currentWearableHigh != high ||
+                            currentWearableLow != low ||
+                            currentWearableId != weatherId) {
+                        Log.d(LOG_TAG, "Wearable will be updated");
+                        UpdateWearableForecast updateWearableForecast =
+                                new UpdateWearableForecast(getContext());
+                        updateWearableForecast.UpdateForecast(weatherId, high, low);
 
-                    // TODO set the wearable status to new values
+                        // TODO set the wearable status to new values
+                    }
                 }
 
             }
