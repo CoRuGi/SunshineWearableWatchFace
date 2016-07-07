@@ -36,6 +36,7 @@ import com.example.android.sunshine.app.R;
 import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.muzei.WeatherMuzeiSource;
+import com.example.android.sunshine.app.wearable.UpdateWearableForecast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -340,7 +341,12 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 if (    currentWearableHigh != high ||
                         currentWearableLow != low ||
                         currentWearableId != weatherId ) {
-                    // TODO send update to wearable;
+                    Log.d(LOG_TAG, "Wearable will be updated");
+                    UpdateWearableForecast updateWearableForecast =
+                            new UpdateWearableForecast(getContext());
+                    updateWearableForecast.UpdateForecast(weatherId, high, low);
+
+                    // TODO set the wearable status to new values
                 }
 
             }
