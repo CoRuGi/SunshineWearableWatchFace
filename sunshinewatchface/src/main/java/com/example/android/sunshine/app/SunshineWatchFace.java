@@ -447,7 +447,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             for (DataEvent event : dataEventBuffer) {
                 DataItem dataItem = event.getDataItem();
                 String path = dataItem.getUri().getPath();
-                Log.d(LOG_TAG, "path = " + path);
                 if (FORECAST_PATH.equals(path)) {
                     DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
                     updateForecast(
@@ -461,7 +460,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
         @Override
         public void onConnected(@Nullable Bundle bundle) {
-            Log.d(LOG_TAG, "Wearable is connected");
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
         }
 
@@ -476,14 +474,9 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         }
 
         public void updateForecast(Integer weatherId, String highTemp, String lowTemp) {
-            Log.d(LOG_TAG, "Update Forecast called!");
             mWeatherId = weatherId;
             mHighTemp = highTemp;
             mLowTemp = lowTemp;
-
-            Log.d(LOG_TAG, "WeatherId = " + mWeatherId);
-            Log.d(LOG_TAG, "highTemp = " + mHighTemp);
-            Log.d(LOG_TAG, "lowTemp = " + mLowTemp);
 
             invalidate();
         }
