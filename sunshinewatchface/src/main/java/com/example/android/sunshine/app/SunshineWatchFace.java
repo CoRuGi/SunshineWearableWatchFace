@@ -21,11 +21,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,6 +45,7 @@ import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -51,6 +55,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -193,7 +198,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mColonPaint = createTextPaint(getColor(R.color.digital_text));
             mSecondTextPaint = createTextPaint(getColor(R.color.secondary_text));
             mWeatherIdPaint = createTextPaint(getColor(R.color.digital_text));
-            mHighTempPaint = createTextPaint(getColor(R.color.digital_text));
+            mHighTempPaint = createTextPaint(getColor(R.color.digital_text), BOLD_TYPEFACE);
             mLowTempPaint = createTextPaint(getColor(R.color.secondary_text));
 
             mTime = new Time();
@@ -388,13 +393,27 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
             // Check if the forecast data has been set
             if (mWeatherId != null && mHighTemp != null && mLowTemp != null) {
+
                 String forecastString = mWeatherId.toString() + " " + mHighTemp + " " + mLowTemp;
                 float forecastXOffset = centerScreen -
                         (mHighTempPaint.measureText(forecastString) / 2);
                 float forecastYOffset = separatorYOffset + (canvas.getHeight() / 5);
 
-                // Draw the Forecast data
-                canvas.drawText(forecastString, forecastXOffset, forecastYOffset, mHighTempPaint);
+                // Draw the Bitmap
+                Integer iconId = Utility.getIconResourceForWeatherCondition(mWeatherId);
+                Bitmap icon = BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                        iconId);
+                canvas.drawBitmap(icon, hourOffset - 10, forecastYOffset - 45, null);
+
+                // Draw the HighTemp
+                float forecastHighTempXOffset = centerScreen -
+                        (mHighTempPaint.measureText(mHighTemp) / 2);
+                canvas.drawText(mHighTemp, forecastHighTempXOffset, forecastYOffset, mHighTempPaint);
+
+                // Draw the LowTemp
+                float forecastLowTempXOffset = forecastHighTempXOffset +
+                        mHighTempPaint.measureText(mHighTemp) + 15;
+                canvas.drawText(mLowTemp, forecastLowTempXOffset, forecastYOffset, mLowTempPaint);
             }
         }
 
@@ -433,15 +452,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         @Override
         public void onDataChanged(DataEventBuffer dataEventBuffer) {
             Log.d(LOG_TAG, "Data changed!");
-            if (!mGoogleApiClient.isConnected() || !mGoogleApiClient.isConnecting()) {
-                ConnectionResult connectionResult = mGoogleApiClient
-                        .blockingConnect(30, TimeUnit.SECONDS);
-                if (!connectionResult.isSuccess()) {
-                    Log.e(LOG_TAG, "ForecastListenerService failed to connect to GoogleApiClient, "
-                            + "error code: " + connectionResult.getErrorCode());
-                    return;
-                }
-            }
 
             // Loop through the events
             for (DataEvent event : dataEventBuffer) {
