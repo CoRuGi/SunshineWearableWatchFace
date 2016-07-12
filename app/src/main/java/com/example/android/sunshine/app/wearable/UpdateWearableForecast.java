@@ -69,32 +69,9 @@ public class UpdateWearableForecast implements
         String highString = Utility.formatTemperature(mContext, highTemp);
         String lowString = Utility.formatTemperature(mContext, lowTemp);
 
-        Bitmap bitmap = null;
-        Asset asset = null;
-        if ( Utility.usingLocalGraphics(mContext) ) {
-            bitmap = BitmapFactory.decodeResource(mContext.getResources(),
-                    Utility.getArtResourceForWeatherCondition(weatherId));
-        } else {
-            try {
-                // Use weather art image
-                bitmap = Glide.with(mContext)
-                        .load(Utility.getArtUrlForWeatherCondition(mContext, weatherId))
-                        .asBitmap()
-                        .error(Utility.getArtResourceForWeatherCondition(weatherId))
-                        .into(100, 100)
-                        .get();
-            } catch (Exception e) {
-                Log.e(LOG_TAG, "Error while loading bitmap: " + e.getMessage());
-            }
-        }
-
-        if (null != bitmap) {
-            asset = toAsset(bitmap);
-        }
-
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/forecast");
         putDataMapRequest.getDataMap().putLong(TIMESTAMP_KEY, System.currentTimeMillis());
-        putDataMapRequest.getDataMap().putAsset(WEATHERID_KEY, asset);
+        putDataMapRequest.getDataMap().putInt(WEATHERID_KEY, weatherId);
         putDataMapRequest.getDataMap().putString(HIGHTEMP_KEY, highString);
         putDataMapRequest.getDataMap().putString(LOWTEMP_KEY, lowString);
         PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
@@ -136,22 +113,5 @@ public class UpdateWearableForecast implements
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
 
-    }
-
-    private static Asset toAsset(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = null;
-        try {
-            byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-            return Asset.createFromBytes(byteArrayOutputStream.toByteArray());
-        } finally {
-            if (null != byteArrayOutputStream) {
-                try {
-                    byteArrayOutputStream.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
     }
 }
