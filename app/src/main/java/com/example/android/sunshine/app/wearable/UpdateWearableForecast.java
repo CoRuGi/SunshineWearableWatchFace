@@ -62,18 +62,15 @@ public class UpdateWearableForecast implements
      * @param highTemp  Integer The high temperature of Today
      * @param lowTemp   Inteder The low temperature of Today
      */
-    public void UpdateForecast(Integer weatherId, Double highTemp, Double lowTemp) {
+    public void UpdateForecast(Integer weatherId, String highTemp, String lowTemp) {
         Log.d(LOG_TAG, "Update Forecast has been called");
         mGoogleApiClient.connect();
-
-        String highString = Utility.formatTemperature(mContext, highTemp);
-        String lowString = Utility.formatTemperature(mContext, lowTemp);
 
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/forecast");
         putDataMapRequest.getDataMap().putLong(TIMESTAMP_KEY, System.currentTimeMillis());
         putDataMapRequest.getDataMap().putInt(WEATHERID_KEY, weatherId);
-        putDataMapRequest.getDataMap().putString(HIGHTEMP_KEY, highString);
-        putDataMapRequest.getDataMap().putString(LOWTEMP_KEY, lowString);
+        putDataMapRequest.getDataMap().putString(HIGHTEMP_KEY, highTemp);
+        putDataMapRequest.getDataMap().putString(LOWTEMP_KEY, lowTemp);
         PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
         Log.d(LOG_TAG, "About to send data");
         Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest)

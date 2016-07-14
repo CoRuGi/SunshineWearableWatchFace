@@ -40,6 +40,7 @@ import com.example.android.sunshine.app.wearable.UpdateWearableForecast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
@@ -349,22 +350,31 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 cVVector.add(weatherValues);
 
                 // Check the Wearable status and send an update if needed
-                Integer currentWearableHigh = Utility.getWearableHighTempStatus(getContext());
-                Integer currentWearableLow = Utility.getWearableLowTempStatus(getContext());
+
+                String currentWearableHigh = Utility.getWearableHighTempStatus(getContext());
+                String currentWearableLow = Utility.getWearableLowTempStatus(getContext());
                 Integer currentWearableId = Utility.getWearableWeatherConditionStatus(getContext());
+
+                // Format the temperatures for easier comparison
+                String formattedHigh = Utility.formatTemperature(getContext(), high);
+                String formattedLow = Utility.formatTemperature(getContext(), low);
 
                 // For the values of Today
                 if (i == 0) {
                     // Compare the values and if not equal then send an update
-                    if (currentWearableHigh != high ||
-                            currentWearableLow != low ||
+                    if (currentWearableHigh.equals(formattedHigh) ||
+                            currentWearableLow.equals(formattedLow) ||
                             currentWearableId != weatherId) {
                         Log.d(LOG_TAG, "Wearable will be updated");
 
                         mUpdateWearableForecast = new UpdateWearableForecast(getContext());
-                        mUpdateWearableForecast.UpdateForecast(weatherId, high, low);
+                        mUpdateWearableForecast.UpdateForecast(
+                                weatherId, formattedHigh, formattedLow
+                        );
 
-                        // TODO set the wearable status to new values
+                        Utility.setWearableHighTempStatus(getContext(), formattedHigh);
+                        Utility.setWearableLowTempStatus(getContext(), formattedLow);
+                        Utility.setWearableWeatherConditionStatus(getContext(), weatherId);
                     }
                 }
             }

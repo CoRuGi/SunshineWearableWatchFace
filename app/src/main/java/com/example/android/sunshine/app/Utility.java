@@ -582,11 +582,11 @@ public class Utility {
      * @param context  Context used to get the SharedPreferences
      * @param highTemp Integer Today's high temperature
      */
-    static public void setWearableHighTempStatus(Context context, Integer highTemp) {
+    static public void setWearableHighTempStatus(Context context, String highTemp) {
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(context.getString(R.string.pref_wearable_high_temp_status_key), highTemp);
+        editor.putString(context.getString(R.string.pref_wearable_high_temp_status_key), highTemp);
         editor.apply();
     }
 
@@ -596,11 +596,11 @@ public class Utility {
      * @param  context Context used to get the SharedPreferences
      * @return Integer The saved today's high temperature
      */
-    static public Integer getWearableHighTempStatus(Context context) {
+    static public String getWearableHighTempStatus(Context context) {
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getInt(
-                context.getString(R.string.pref_wearable_high_temp_status_key), -1
+        return sharedPreferences.getString(
+                context.getString(R.string.pref_wearable_high_temp_status_key), "-1"
         );
     }
 
@@ -610,11 +610,11 @@ public class Utility {
      * @param context Context used to get the SharedPreferences
      * @param lowTemp Integer Today's low temperature
      */
-    static public void setWearableLowTempStatus(Context context, Integer lowTemp) {
+    static public void setWearableLowTempStatus(Context context, String lowTemp) {
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(context.getString(R.string.pref_wearable_low_temp_status_key), lowTemp);
+        editor.putString(context.getString(R.string.pref_wearable_low_temp_status_key), lowTemp);
         editor.apply();
     }
 
@@ -624,11 +624,11 @@ public class Utility {
      * @param  context Context used to get the SharedPreferences
      * @return Integer The saved today's low temperature
      */
-    static public Integer getWearableLowTempStatus(Context context) {
+    static public String getWearableLowTempStatus(Context context) {
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getInt(
-                context.getString(R.string.pref_wearable_low_temp_status_key), -1
+        return sharedPreferences.getString(
+                context.getString(R.string.pref_wearable_low_temp_status_key), "-1"
         );
     }
 
