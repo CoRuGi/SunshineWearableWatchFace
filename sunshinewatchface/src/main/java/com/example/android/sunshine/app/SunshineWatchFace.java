@@ -401,11 +401,14 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             // Check if the forecast data has been set
             if (mWeatherId != null && mHighTemp != null && mLowTemp != null) {
 
-                // Draw the Bitmap
-                Integer iconId = Utility.getIconResourceForWeatherCondition(mWeatherId);
-                Bitmap icon = BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                        iconId);
-                canvas.drawBitmap(icon, hourOffset - 10, forecastYOffset - 45, null);
+                // Hide when in ambient mode
+                if (!mAmbient) {
+                    // Draw the Bitmap
+                    Integer iconId = Utility.getIconResourceForWeatherCondition(mWeatherId);
+                    Bitmap icon = BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                            iconId);
+                    canvas.drawBitmap(icon, hourOffset - 10, forecastYOffset - 45, null);
+                }
 
                 // Draw the HighTemp
                 float forecastHighTempXOffset = centerScreen -
