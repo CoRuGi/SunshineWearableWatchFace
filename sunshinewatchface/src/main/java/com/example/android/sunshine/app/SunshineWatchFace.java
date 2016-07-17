@@ -45,6 +45,7 @@ import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
@@ -129,8 +130,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         Paint mWeatherIdPaint;
         Paint mHighTempPaint;
         Paint mLowTempPaint;
+        Paint mMessagePaint;
         float mDateHeight = 15f;
         float mForecastHeight = 20f;
+        float mMessageHeight = 10f;
 
         boolean mAmbient;
         Time mTime;
@@ -200,6 +203,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mWeatherIdPaint = createTextPaint(getColor(R.color.digital_text));
             mHighTempPaint = createTextPaint(getColor(R.color.digital_text), BOLD_TYPEFACE);
             mLowTempPaint = createTextPaint(getColor(R.color.secondary_text));
+            mMessagePaint = createTextPaint(getColor(R.color.digital_text));
 
             mTime = new Time();
 
@@ -287,6 +291,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mWeatherIdPaint.setTextSize(mForecastHeight * metrics.density);
             mHighTempPaint.setTextSize(mForecastHeight * metrics.density);
             mLowTempPaint.setTextSize(mForecastHeight * metrics.density);
+            mMessagePaint.setTextSize(mMessageHeight * metrics.density);
 
         }
 
@@ -391,13 +396,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             // Draw the separator
             canvas.drawText(separatorString, separatorXOffset, separatorYOffset, mSecondTextPaint);
 
+            float forecastYOffset = separatorYOffset + (canvas.getHeight() / 5);
+
             // Check if the forecast data has been set
             if (mWeatherId != null && mHighTemp != null && mLowTemp != null) {
-
-                String forecastString = mWeatherId.toString() + " " + mHighTemp + " " + mLowTemp;
-                float forecastXOffset = centerScreen -
-                        (mHighTempPaint.measureText(forecastString) / 2);
-                float forecastYOffset = separatorYOffset + (canvas.getHeight() / 5);
 
                 // Draw the Bitmap
                 Integer iconId = Utility.getIconResourceForWeatherCondition(mWeatherId);
@@ -414,6 +416,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 float forecastLowTempXOffset = forecastHighTempXOffset +
                         mHighTempPaint.measureText(mHighTemp) + 15;
                 canvas.drawText(mLowTemp, forecastLowTempXOffset, forecastYOffset, mLowTempPaint);
+            } else {
+                String messageString = getResources().getString(R.string.temperary_message);
+                float tempMessageXOffset = centerScreen -
+                        (mMessagePaint.measureText(messageString) / 2);
+                canvas.drawText(messageString, tempMessageXOffset, forecastYOffset, mMessagePaint);
             }
         }
 
