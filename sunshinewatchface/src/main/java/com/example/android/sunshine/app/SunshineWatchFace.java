@@ -27,8 +27,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -45,18 +43,17 @@ import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.server.converter.StringToIntConverter;
-import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
-import com.google.android.gms.wearable.WearableListenerService;
 
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -119,6 +116,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             GoogleApiClient.OnConnectionFailedListener {
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
+
+        private static final String FORECAST_UPDATE_PATH = "/forecast_update";
+        private static final String FORECAST_UPDATE_KEY =
+                "com.example.android.sunshine.app.forecast_update";
 
         Paint mBackgroundPaint;
         Paint mTextPaint;
@@ -207,7 +208,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
             mTime = new Time();
 
-            //mGoogleApiClient.connect();
         }
 
         @Override
@@ -235,6 +235,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             if (visible) {
                 registerReceiver();
                 mGoogleApiClient.connect();
+
+                // Send message to update the forecast if needed
+                if (mWeatherId == null || mHighTemp == null || mLowTemp == null) {
+                    sendForecastRequest();
+                }
 
                 // Update time zone in case it changed while we weren't visible.
                 mTime.clear(TimeZone.getDefault().getID());
@@ -499,6 +504,23 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mLowTemp = lowTemp;
 
             invalidate();
+        }
+
+        private void sendForecastRequest() {
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(FORECAST_UPDATE_PATH);
+            putDataMapRequest.getDataMap().putLong(FORECAST_UPDATE_KEY, System.currentTimeMillis());
+            PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest)
+                    .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                        @Override
+                        public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
+                            if (!dataItemResult.getStatus().isSuccess()) {
+                                Log.d(LOG_TAG, "Failed to send Forecast update request!");
+                            } else {
+                                Log.d(LOG_TAG, "Successfully sent the Forecast update request");
+                            }
+                        }
+                    });
         }
     }
 }
